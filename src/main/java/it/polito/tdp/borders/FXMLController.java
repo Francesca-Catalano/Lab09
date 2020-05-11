@@ -28,6 +28,25 @@ public class FXMLController {
 
     @FXML
     void doCalcolaConfini(ActionEvent event) {
+    	int x ;
+    	try
+    	{
+    		x= Integer.parseInt(this.txtAnno.getText());
+    	} catch(NumberFormatException e)
+    	{
+    		this.txtResult.setText("Formato non valido\n");
+    		return;
+    	}
+    	if(x < 1816 || x >2016)
+    	{
+    		this.txtResult.setText("Inserire un anno compreso tra 1816 e 2016!\n");
+    		return;
+    	}
+    	//calcolo dei confini 
+    	this.model.creaGrafo(x);
+    	this.txtResult.appendText("Numero Vertivi : "+ this.model.VertixSize()+"\n");
+    	this.txtResult.appendText("Numero Archi : "+ this.model.EdgeSize()+"\n");
+    	
 
     }
 
