@@ -41,7 +41,7 @@ public class Country {
 	}
 	@Override
 	public String toString() {
-		return "[ "+name+" ] ";
+		return name;
 	}
 
 }

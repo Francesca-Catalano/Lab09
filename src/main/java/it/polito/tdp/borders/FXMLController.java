@@ -3,10 +3,14 @@ package it.polito.tdp.borders;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Set;
 
+import it.polito.tdp.borders.model.Country;
 import it.polito.tdp.borders.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -27,6 +31,35 @@ public class FXMLController {
     private TextArea txtResult; // Value injected by FXMLLoader
 
     @FXML
+    private ComboBox<Country> ComboBox;
+
+    @FXML
+    private Button btnRicerccaStati;
+    
+    @FXML
+    void doRicercaStati(ActionEvent event) {
+    	if (this.ComboBox.getValue()==null && this.txtAnno==null)
+    	{this.txtResult.appendText("Inserire prima un anno e poi uno stato!\n");
+    	return;}
+    	if (this.ComboBox.getValue()==null )
+    	{this.txtResult.appendText("Inserire  uno stato!\n");
+    	return;}
+    Set<Country> list = 	this.model.getListaVicini2(this.ComboBox.getValue());
+    if(list==null)
+    {this.txtResult.appendText("Nessun vicino trovato\n");
+	return;}
+    this.txtResult.appendText("Lista di stati vicini : \n");
+    for(Country c : list)
+    {
+    	  this.txtResult.appendText(c+"\n");
+    }
+    
+    this.txtResult.appendText(list.size()+"\n");
+    
+
+    }
+
+    @FXML
     void doCalcolaConfini(ActionEvent event) {
     	int x ;
     	try
@@ -40,19 +73,47 @@ public class FXMLController {
     	if(x < 1816 || x >2016)
     	{
     		this.txtResult.setText("Inserire un anno compreso tra 1816 e 2016!\n");
+    		this.txtAnno.clear();
     		return;
     	}
     	//calcolo dei confini 
     	this.model.creaGrafo(x);
+    	this.ComboBox.getItems().addAll(this.model.getGrafo().vertexSet());
+    	if(this.model.VertixSize()==0 || this.model.getGrafo().vertexSet()==null)
+    	{
+    		this.txtResult.appendText("Errore! Il grafo non presente vertici!\n");
+    		return;
+    	}
+    	if(this.model.EdgeSize()==0)
+    	{
+    		this.txtResult.appendText("Errore! Il grafo non presente archi!\n");
+    		return;
+    	}
     	this.txtResult.appendText("Numero Vertivi : "+ this.model.VertixSize()+"\n");
     	this.txtResult.appendText("Numero Archi : "+ this.model.EdgeSize()+"\n");
     	
+    	
+    	for( Country c : this.model.getGrafo().vertexSet())
+    	{
+    		this.txtResult.appendText(c.getName()+"  : "+ this.model.getGrafo().degreeOf(c)+"\n" );
+    	}
+    	
+    	if(this.model.getNumberComponentiConnesse()==0)
+    	{
+    		this.txtResult.appendText("Errore: nessuna componente connessa trovata!\n");
+    		return;
+    	}
+    	
+    	this.txtResult.appendText("Numero di componenti connesse : "+this.model.getNumberComponentiConnesse()+"\n" );
 
     }
 
-    @FXML // This method is called by the FXMLLoader when initialization is complete
+
+    @FXML
     void initialize() {
         assert txtAnno != null : "fx:id=\"txtAnno\" was not injected: check your FXML file 'Scene.fxml'.";
+        assert ComboBox != null : "fx:id=\"ComboBox\" was not injected: check your FXML file 'Scene.fxml'.";
+        assert btnRicerccaStati != null : "fx:id=\"btnRicerccaStati\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
 
     }

@@ -2,6 +2,8 @@ package it.polito.tdp.borders.model;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,9 +11,12 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.jgrapht.Graphs;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jgrapht.traverse.GraphIterator;
 
 import it.polito.tdp.borders.db.BordersDAO;
 
@@ -20,7 +25,7 @@ public class Model {
 	private SimpleGraph<Country, DefaultEdge> graph ;
 	private Map<Integer,Country> map;
 	private BordersDAO dao;
-
+private Map<Country,Country> visita = new HashMap<>();
 
 	public Model() {
 		this.graph= new SimpleGraph<>(DefaultEdge.class);
@@ -58,9 +63,31 @@ public class Model {
 		
 		  }
 		  System.out.print(this.graph);
+		  
+		
 	}
 	
-
+	public Set<Country> getListaVicini2(Country source)
+	{ 
+		GraphIterator<Country, DefaultEdge> bvs=new BreadthFirstIterator<Country, DefaultEdge>(this.graph,source);
+		Set<Country> visita = new HashSet<Country>();
+		while(bvs.hasNext())
+		{
+			visita.add(bvs.next());
+		}
+		return visita;
+		
+	}
+	
+	public int getNumberComponentiConnesse()
+	{ 
+		  ConnectivityInspector<Country, DefaultEdge> cis= new
+		  ConnectivityInspector<Country, DefaultEdge>(graph); return
+		  cis.connectedSets().size();
+		 
+		
+		
+	}
 	
 	public int VertixSize()
 	{
@@ -72,6 +99,8 @@ public class Model {
 	}
 	public SimpleGraph<Country, DefaultEdge> getGrafo()
 	{return this.graph;}
+	
+
 
 	//grado vertice = Il numero di archi incidenti in un vertice v ∈ V (cioè il numero di archi che si connettono ad esso) prende il nome di grado del vertice v. Un arco che si connette al vertice ad entrambe le estremità (un cappio) è contato due volte.
 }
